@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  config   = "*.*.{*}.*.timezone=IST"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(uuid())
+  firstName    String
+  lastName     String?
+  email        String         @unique
+  password     String
+  role         UserRole       @relation(fields: [userRoleId], references: [id])
+  userRoleId   String
+  createdAt    DateTime       @default(now()) @map("event_datetime_with_tz")
+  orderDetails OrderDetails[]
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  role      String   @unique
+  user      User[]
+  createdAt DateTime @default(now())
+}
+
+model OrderDetails {
+  id                  String               @id @default(uuid())
+  name                String
+  code                String               @unique
+  orderDate           DateTime
+  deliveryDate        DateTime
+  type                String
+  typeOfMould         String
+  pattern             String
+  neelDesign          String
+  sideDesign          String
+  soleDesign          String
+  size                Int
+  plateDrawingAndSize String
+  nakkaFitting        String
+  expansion           String
+  notes               String
+  images              OrderImages[]
+  createdAt           DateTime             @default(now())
+  user                User                 @relation(fields: [userId], references: [id])
+  userId              String
+  updatedAt           OrderUpdateDetails[]
+}
+
+model OrderUpdateDetails {
+  id             String       @id @default(uuid())
+  updatedAt      DateTime
+  orderDetails   OrderDetails @relation(fields: [orderDetailsId], references: [id])
+  orderDetailsId String
+}
+
+model OrderImages {
+  id             String       @id @default(uuid())
+  image          String
+  orderDetails   OrderDetails @relation(fields: [orderDetailsId], references: [id])
+  orderDetailsId String
+}
