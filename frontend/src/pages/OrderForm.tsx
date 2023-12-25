@@ -5,10 +5,46 @@ import TextField from "@mui/material/TextField";
 import { Button, Paper, Stack } from "@mui/material";
 import useStyles from "../styles";
 
+interface OrderDetails {
+  name: string;
+  code: string;
+  orderDate: any;
+  deliveryDate: any;
+  type: string;
+  typeOfMould: string;
+  pattern: string;
+  neelDesign: string;
+  sideDesign: string;
+  soleDesign: string;
+  size: number | null;
+  plateDrawingAndSize: string;
+  nakkaFitting: string;
+  expansion: string;
+  notes: string;
+  images: FileList | null;
+}
 export default function AddressForm() {
   const classes = useStyles();
   const [images, setImages] = React.useState<string[]>([]);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const [orderDetails, setOrderDetails] = React.useState<OrderDetails>({
+    name: "",
+    code: "",
+    orderDate: null,
+    deliveryDate: null,
+    type: "",
+    typeOfMould: "",
+    pattern: "",
+    neelDesign: "",
+    sideDesign: "",
+    soleDesign: "",
+    size: null,
+    plateDrawingAndSize: "",
+    nakkaFitting: "",
+    expansion: "",
+    notes: "",
+    images: null,
+  });
   const handleImageSelect = () => {
     if (inputRef.current) {
       inputRef.current.click();
@@ -16,8 +52,10 @@ export default function AddressForm() {
   };
 
   const handleImagesSelect = (e: any) => {
-    console.log(typeof e.target.files);
-
+    setOrderDetails((prev: any) => ({
+      ...prev,
+      images: e.target.files,
+    }));
     const ImagesArray = Array.from(e?.target?.files)?.map((file: any) =>
       URL.createObjectURL(file)
     );
@@ -56,7 +94,7 @@ export default function AddressForm() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="order_date"
+                  name="orderDate"
                   label="Order Date"
                   fullWidth
                   variant="outlined"
@@ -66,7 +104,7 @@ export default function AddressForm() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="delivery_date"
+                  name="deliveryDate"
                   label="Delivery Date"
                   fullWidth
                   variant="outlined"
@@ -87,7 +125,7 @@ export default function AddressForm() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="type_of_mould"
+                  name="typeOfMould"
                   label="Type of Mould"
                   fullWidth
                   variant="outlined"
@@ -107,7 +145,7 @@ export default function AddressForm() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="neel_design"
+                  name="neelDesign"
                   label="Neel Design"
                   fullWidth
                   variant="outlined"
@@ -117,7 +155,7 @@ export default function AddressForm() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="side_design"
+                  name="sideDesign"
                   label="Side Design"
                   fullWidth
                   variant="outlined"
@@ -127,7 +165,7 @@ export default function AddressForm() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="sole_design"
+                  name="soleDesign"
                   label="Sole Design"
                   fullWidth
                   variant="outlined"
@@ -148,7 +186,7 @@ export default function AddressForm() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="plate_drawing_and_size"
+                  name="plateDrawingAndSize"
                   label="Plate Drawing and Size"
                   fullWidth
                   variant="outlined"
@@ -158,7 +196,7 @@ export default function AddressForm() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="nakka_and_fitting"
+                  name="nakkaAndFitting"
                   label="Nakka + Fitting"
                   fullWidth
                   variant="outlined"

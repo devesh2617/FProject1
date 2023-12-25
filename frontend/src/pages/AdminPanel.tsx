@@ -4,7 +4,6 @@ import Styles from "../styles";
 import formatObjectValues from "../utils/formatObjectValues";
 import { postApi } from "../api/axios";
 import { toast } from "react-toastify";
-import { AxiosError, AxiosResponse } from "axios";
 
 interface UserData {
   firstName: string;
@@ -60,9 +59,9 @@ const AdminPanel = () => {
 
   const handleRoleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const body = role.trim();
-    console.log(body);
-    postApi("admin/create-role", { role: body })
+
+    const body = formatObjectValues({ role: role });
+    postApi("admin/create-role", body)
       .then((res: any) => {
         if (res.status === 200 || res.status === 201) {
           toast.success(res.data.message);
@@ -112,7 +111,7 @@ const AdminPanel = () => {
             />
             <TextField
               label="Role"
-              type="role"
+              type="text"
               name="role"
               required
               value={userData.role}

@@ -6,10 +6,13 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
-Router.post("/create-role", async (req: Request, res: Response) => {
+Router.post("/create-role", async (req: any, res: Response) => {
+  if (req.userRole !== "admin")
+    return res.status(409).json({
+      error: "Only admin can create a role",
+    });
+  const role = req.body.role;
   try {
-    const role = req.body.role;
-
     // Check if the role already exists
     const existingRole = await prisma.userRole.findFirst({
       where: { role },
@@ -33,7 +36,11 @@ Router.post("/create-role", async (req: Request, res: Response) => {
   }
 });
 
-Router.post("/create-user", async (req: Request, res: Response) => {
+Router.post("/create-user", async (req: any, res: Response) => {
+  if (req.userRole !== "admin")
+    return res.status(409).json({
+      error: "Only admin can create a user",
+    });
   try {
     const { firstName, lastName, email, role } = req.body;
     if (role === "admin") {
@@ -51,6 +58,14 @@ Router.post("/create-user", async (req: Request, res: Response) => {
           .json({ error: "Admin already exists for this site" });
       }
     }
+    const userWithEmail = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (userWithEmail)
+      return res
+        .status(409)
+        .json({ error: "User already exist with this email" });
+
     // Hash the password
     const password = process.env.DEFAULT_PASSWORD;
     if (!password)
@@ -80,6 +95,7 @@ Router.post("/create-user", async (req: Request, res: Response) => {
     res.status(201).json({ message: "User created successfully" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+    console.log(error.message);
   }
 });
 

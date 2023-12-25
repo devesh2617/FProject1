@@ -1,29 +1,27 @@
 import express, { Request, Response } from "express";
 import path from "path";
 import { PrismaClient } from "@prisma/client";
+const formData = require("express-form-data");
 import orderRouter from "./routers/orderRouter";
-// import bodyParser from 'body-parser';
+
+import adminRouter from "./routers/adminRouter";
+import bcrypt from "bcrypt";
+import userIdentificationMiddleware from "./middlewares/userIdentificationMiddleware";
+const jwt = require("jsonwebtoken");
+const secretKey = process.env.SECRET_KEY; // Replace with your secret key
 const app = express();
 const cors = require("cors");
 const corsOptions = {
   origin: "http://localhost:5173", // Replace with your allowed origin
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  optionsSuccessStatus: 204, // Respond with a 204 status for preflight requests
 };
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors(corsOptions));
 require("dotenv").config();
-import adminRouter from "./routers/adminRouter";
-import bcrypt from "bcrypt";
-const jwt = require("jsonwebtoken");
-const secretKey = process.env.SECRET_KEY; // Replace with your secret key
-
 const prisma = new PrismaClient();
-// Parse incoming requests with JSON payloads
-app.use(express.json());
-
-// Parse incoming requests with URL-encoded payloads
-app.use(express.urlencoded({ extended: true }));
+// Parse incoming requests with form data payloads
+app.use(formData.parse());
+app.use(userIdentificationMiddleware);
 
 const PORT = 3000;
 app.use("/admin", adminRouter);
@@ -31,7 +29,7 @@ app.use("/order", orderRouter);
 app.post("/login", async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-
+    // console.log(req.body);
     const user = await prisma.user.findUnique({
       where: {
         email,
@@ -51,8 +49,10 @@ app.post("/login", async (req: Request, res: Response) => {
         });
       } else if (result) {
         const payload = {
+          id: user.id,
           username: user.firstName + " " + user.lastName,
           email: user.email,
+          role: user.role.role,
         };
         const options = {
           expiresIn: "24h", // Token expiration time

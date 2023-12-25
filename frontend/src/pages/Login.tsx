@@ -27,13 +27,14 @@ const Login = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const body = {
-      email: data.email.trim(),
-      password: data.password,
-    };
-    postApi("login", body)
+    const formData = new FormData();
+    formData.append("email", data.email.trim());
+    formData.append("password", data.password);
+
+    postApi("login", formData)
       .then((res: any) => {
         if (res.status === 200 || res.status === 201) {
+          localStorage.setItem("token", res.data.token);
           navigate("/order-form");
           toast.success(res.data.message);
         } else {
@@ -41,7 +42,7 @@ const Login = () => {
         }
       })
       .catch((error: any) => {
-        console.log(error.message);
+        toast.error(error.message);
       });
   };
 

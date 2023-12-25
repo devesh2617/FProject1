@@ -1,22 +1,29 @@
-import axios from 'axios'
+import axios from "axios";
 
-
-const getApi = async (url:string) => {
-   try {
-    const res = await axios.get(`http://localhost:3000/${url}`)
-    return res
-   } catch (error:any) {
-    return error
-   }
-}
-
-const postApi = async (url:string, body: object) => {
+const getApi = async (url: string) => {
   try {
-   const res = await axios.post(`http://localhost:3000/${url}`, body)
-   return res
-  } catch (error:any) {
-    return error
+    const res = await axios.get(`http://localhost:3000/${url}`, {
+      headers: {
+        Authorization: localStorage.getItem("token"),
+      },
+    });
+    return res;
+  } catch (error: any) {
+    return error;
   }
-}
+};
 
-export {getApi, postApi}
+const postApi = async (url: string, body: FormData) => {
+  try {
+    const res = await axios.post(`http://localhost:3000/${url}`, body, {
+      headers: {
+        Authorization: localStorage.getItem("token"),
+      },
+    });
+    return res;
+  } catch (error: any) {
+    return error;
+  }
+};
+
+export { getApi, postApi };
