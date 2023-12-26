@@ -4,6 +4,12 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import { Button, Paper, Stack } from "@mui/material";
 import useStyles from "../styles";
+import formatObjectValues from "../utils/formatObjectValues";
+import { postApi } from "../api/axios";
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 interface OrderDetails {
   name: string;
@@ -51,7 +57,28 @@ export default function AddressForm() {
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setOrderDetails((prev: any) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleOrderSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const body = formatObjectValues(orderDetails);
+
+    postApi("order/create-order", body).then((res: any) => {
+      console.log(res);
+    });
+  };
+
   const handleImagesSelect = (e: any) => {
+    const formData = new FormData();
+    formData.append("images", e.target.files);
+    postApi("order/upload-order-images", formData);
     setOrderDetails((prev: any) => ({
       ...prev,
       images: e.target.files,
@@ -69,16 +96,17 @@ export default function AddressForm() {
           <Typography variant="h5" gutterBottom>
             Order Details
           </Typography>
-          <form>
+          <form onSubmit={handleOrderSubmit}>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
                   name="name"
                   label="Name"
+                  value={orderDetails.name}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -86,30 +114,41 @@ export default function AddressForm() {
                   required
                   name="code"
                   label="Code"
+                  value={orderDetails.code}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  name="orderDate"
-                  label="Order Date"
-                  fullWidth
-                  variant="outlined"
-                  margin="normal"
-                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Order Date"
+                    sx={{ width: "100%" }}
+                    value={orderDetails.orderDate}
+                    onChange={(newValue) => {
+                      setOrderDetails((prev: any) => ({
+                        ...prev,
+                        orderDate: newValue,
+                      }));
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  name="deliveryDate"
-                  label="Delivery Date"
-                  fullWidth
-                  variant="outlined"
-                  margin="normal"
-                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Delivery Date"
+                    sx={{ width: "100%" }}
+                    value={orderDetails.deliveryDate}
+                    onChange={(newValue) => {
+                      setOrderDetails((prev: any) => ({
+                        ...prev,
+                        deliveryDate: newValue,
+                      }));
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
 
               <Grid item xs={12} sm={6}>
@@ -117,9 +156,10 @@ export default function AddressForm() {
                   required
                   name="type"
                   label="Type"
+                  value={orderDetails.type}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -127,9 +167,10 @@ export default function AddressForm() {
                   required
                   name="typeOfMould"
                   label="Type of Mould"
+                  value={orderDetails.typeOfMould}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -137,9 +178,10 @@ export default function AddressForm() {
                   required
                   name="pattern"
                   label="Pattern"
+                  value={orderDetails.pattern}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -147,9 +189,10 @@ export default function AddressForm() {
                   required
                   name="neelDesign"
                   label="Neel Design"
+                  value={orderDetails.neelDesign}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -157,9 +200,10 @@ export default function AddressForm() {
                   required
                   name="sideDesign"
                   label="Side Design"
+                  value={orderDetails.sideDesign}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -167,9 +211,10 @@ export default function AddressForm() {
                   required
                   name="soleDesign"
                   label="Sole Design"
+                  value={orderDetails.soleDesign}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -178,9 +223,10 @@ export default function AddressForm() {
                   name="size"
                   type="number"
                   label="Size"
+                  value={orderDetails.size}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -188,19 +234,21 @@ export default function AddressForm() {
                   required
                   name="plateDrawingAndSize"
                   label="Plate Drawing and Size"
+                  value={orderDetails.plateDrawingAndSize}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
-                  name="nakkaAndFitting"
+                  name="nakkaFitting"
                   label="Nakka + Fitting"
+                  value={orderDetails.nakkaFitting}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -208,9 +256,10 @@ export default function AddressForm() {
                   required
                   name="expansion"
                   label="Expansion"
+                  value={orderDetails.expansion}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -218,12 +267,13 @@ export default function AddressForm() {
                   required
                   name="notes"
                   label="Notes"
+                  value={orderDetails.notes}
                   fullWidth
                   variant="outlined"
-                  margin="normal"
                   multiline
                   minRows={2}
                   maxRows={2}
+                  onChange={handleChange}
                 />
               </Grid>
             </Grid>
@@ -257,15 +307,15 @@ export default function AddressForm() {
               onChange={handleImagesSelect}
             ></input>
           </Stack>
-          <Stack direction="column" gap={2}>
+          <Stack direction="column" gap={2} sx={{ alignItems: "center" }}>
             {images?.map((image: string, index: number) => {
               return (
                 <img
                   key={index}
                   src={image}
                   style={{
-                    width: "15rem",
-                    height: "12srem",
+                    width: "12rem",
+                    height: "10rem",
                   }}
                 />
               );

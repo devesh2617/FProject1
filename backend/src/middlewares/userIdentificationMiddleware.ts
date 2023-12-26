@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 const jwt = require("jsonwebtoken");
 
 const Middleware = async (req: any, res: Response, next: NextFunction) => {

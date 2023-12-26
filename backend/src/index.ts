@@ -20,7 +20,11 @@ app.use(cors(corsOptions));
 require("dotenv").config();
 const prisma = new PrismaClient();
 // Parse incoming requests with form data payloads
-app.use(formData.parse());
+app.use(
+  formData.parse({
+    maxFileSize: 50 * 1024 * 1024,
+  })
+);
 app.use(userIdentificationMiddleware);
 
 const PORT = 3000;

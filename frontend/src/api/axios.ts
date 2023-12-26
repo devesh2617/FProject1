@@ -18,6 +18,7 @@ const postApi = async (url: string, body: FormData) => {
     const res = await axios.post(`http://localhost:3000/${url}`, body, {
       headers: {
         Authorization: localStorage.getItem("token"),
+        "Content-Type": "mutlipart/form-data",
       },
     });
     return res;
